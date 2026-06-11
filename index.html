@@ -422,6 +422,7 @@
     }
 
     @media (max-width: 960px) {
+      #small-screen-overlay { display: flex; }
       #camera-pip { display: none !important; }
     }
   </style>
@@ -614,11 +615,6 @@
 
   // ─── Auto-start ───
   (async () => {
-    // If screen is too small, show overlay and skip camera entirely
-    if (window.innerWidth < 960) {
-      document.getElementById('small-screen-overlay').classList.add('visible');
-      return;
-    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       video.srcObject = stream;
