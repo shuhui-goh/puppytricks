@@ -614,7 +614,11 @@
   };
 
   // ─── Auto-start ───
-  (async () => {
+  let cameraStarted = false;
+
+  async function startCamera() {
+    if (cameraStarted) return;
+    cameraStarted = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       video.srcObject = stream;
@@ -631,7 +635,19 @@
     } catch (err) {
       showStatus('Camera access denied. Please allow camera and refresh.');
     }
-  })();
+  }
+
+  // Only start camera if screen is wide enough
+  if (window.innerWidth >= 960) {
+    startCamera();
+  }
+
+  // If user resizes to desktop, start camera then
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 960 && !cameraStarted) {
+      startCamera();
+    }
+  });
 
   // ─── MediaPipe init ───
   async function initMediaPipe() {
