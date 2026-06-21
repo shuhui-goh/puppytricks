@@ -344,33 +344,19 @@
       bottom: 24px;
       right: 24px;
       display: none;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0;
       z-index: 20;
     }
     #camera-pip.visible { display: flex; }
-    #camera-pip-label {
-      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', sans-serif;
-      font-size: 16px;
-      color: rgba(255,255,255,0.95);
-      margin-bottom: 0;
-      font-weight: 600;
-      padding-left: 2px;
-    }
     #camera-feed-wrapper {
       background: rgba(30, 50, 20, 0.45);
       backdrop-filter: blur(40px) saturate(140%);
       -webkit-backdrop-filter: blur(40px) saturate(140%);
       border-radius: 16px;
-      padding: 12px;
+      padding: 8px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.25),
         0 8px 32px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
     }
     #webcam {
       width: 140px;
@@ -400,12 +386,148 @@
 
     /* ─── Z-INDEX STACK ─── */
     #small-screen-overlay { z-index: 100; }
+    #about-panel       { z-index: 90; }
     #cmd-label        { z-index: 30; }
+    #about-btn         { z-index: 25; }
     #legend           { z-index: 20; }
     #camera-pip       { z-index: 20; }
     #puppy-wrap       { z-index: 10; }
 
     #main-screen { position: relative; z-index: 1; }
+
+    /* ─── ABOUT BUTTON ─── */
+    #about-btn {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: rgba(30, 50, 20, 0.45);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+      padding: 0;
+    }
+    #about-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    #about-btn:focus-visible,
+    #about-panel-close:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.9);
+      outline-offset: 2px;
+    }
+    #about-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: rgba(255, 255, 255, 0.95);
+    }
+
+    /* ─── ABOUT PANEL (grows out from the button's own corner) ─── */
+    #about-panel {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      width: 300px;
+      max-height: 420px;
+      background: rgba(30, 50, 20, 0.7);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      border-radius: 14px;
+      padding: 20px 48px 20px 20px;
+      overflow-y: auto;
+      opacity: 0;
+      transform-origin: top right;
+      transform: scale(0.1333); /* 40px / 300px, so the scaled-down box matches the closed button's footprint */
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    #about-panel.open {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    #about-panel:not(.open) {
+      transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #about-panel[hidden] {
+      display: block; /* override default none so the close transition can finish */
+      visibility: hidden;
+    }
+    #about-panel-close {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      width: 39px;
+      height: 39px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 13px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      transition: background 0.2s;
+      z-index: 1;
+    }
+    #about-panel-close:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    #about-panel-close svg {
+      width: 18px;
+      height: 18px;
+      stroke: rgba(255, 255, 255, 0.75);
+    }
+    #about-panel-content {
+      opacity: 0;
+      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #about-panel.open #about-panel-content {
+      opacity: 1;
+    }
+    #about-panel:not(.open) #about-panel-content {
+      transition: opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    #about-panel p {
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.82);
+      margin: 0 0 14px;
+    }
+    #about-panel p:last-child {
+      margin-bottom: 0;
+    }
+    #about-panel a {
+      font-weight: 600;
+      color: #fff;
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 255, 255, 0.5);
+    }
+    #about-panel a:hover {
+      text-decoration-color: rgba(255, 255, 255, 0.95);
+    }
 
     /* ─── SMALL SCREEN OVERLAY ─── */
     #small-screen-overlay {
@@ -464,6 +586,8 @@
     @media (max-width: 960px) {
       #small-screen-overlay { display: flex; }
       #camera-pip { display: none !important; }
+      #about-btn { display: none !important; }
+      #about-panel { display: none !important; }
     }
   </style>
 </head>
@@ -1150,6 +1274,31 @@
 </div>
 
 <!-- GESTURE PANEL -->
+<!-- About button -->
+<button id="about-btn" type="button" aria-expanded="false" aria-controls="about-panel" aria-label="About this project">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"></circle>
+    <path d="M12 16v-4"></path>
+    <path d="M12 8h.01"></path>
+  </svg>
+</button>
+
+<!-- About panel: expands in place near the button, page stays visible and interactive -->
+<div id="about-panel" role="dialog" aria-modal="false" aria-labelledby="about-panel-title" hidden>
+  <button id="about-panel-close" type="button" aria-label="Close about panel">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M18 6 6 18"></path>
+      <path d="m6 6 12 12"></path>
+    </svg>
+  </button>
+  <div id="about-panel-content">
+    <h2 id="about-panel-title" class="sr-only">About Puppy Tricks</h2>
+    <p>For anyone who's ever wanted a puppy and couldn't have one: this was made with you in mind too. That was me growing up, so I built one.</p>
+    <p>Code's on <a href="https://github.com/shuhui-goh/puppytricks" target="_blank" rel="noopener">GitHub</a>.</p>
+    <p>Hope you enjoy it as much as I do, Shuhui 🐶</p>
+  </div>
+</div>
+
 <div id="legend">
   <h3>Gestures</h3>
 
@@ -1194,12 +1343,98 @@
 <!-- Camera PiP -->
 <div id="camera-pip">
   <div id="camera-feed-wrapper">
-    <span id="camera-pip-label">Your camera</span>
-    <video id="webcam" autoplay muted playsinline></video>
+    <video id="webcam" autoplay muted playsinline aria-label="Your camera feed"></video>
   </div>
 </div>
+
 <canvas id="proc-canvas"></canvas>
 <div id="status-msg"></div>
+
+<script>
+  (function () {
+    const btn = document.getElementById('about-btn');
+    const panel = document.getElementById('about-panel');
+    const closeBtn = document.getElementById('about-panel-close');
+    const backgroundEls = [
+      document.getElementById('main-screen'),
+      document.getElementById('legend'),
+      document.getElementById('camera-pip')
+    ].filter(Boolean);
+    let lastFocused = null;
+
+    function getFocusable() {
+      return panel.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
+    }
+
+    function setBackgroundInert(value) {
+      backgroundEls.forEach(el => {
+        if ('inert' in HTMLElement.prototype) {
+          el.inert = value;
+        } else if (value) {
+          el.setAttribute('aria-hidden', 'true');
+        } else {
+          el.removeAttribute('aria-hidden');
+        }
+      });
+    }
+
+    function openPanel() {
+      lastFocused = document.activeElement;
+      panel.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      btn.style.visibility = 'hidden';
+      // Keep the dog/camera/legend visible, but remove them from
+      // the tab order and screen reader tree while the panel is open.
+      setBackgroundInert(true);
+      requestAnimationFrame(() => {
+        panel.classList.add('open');
+        closeBtn.focus();
+      });
+      document.addEventListener('keydown', onKeydown);
+      panel.addEventListener('keydown', onPanelTab);
+    }
+
+    function closePanel() {
+      panel.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.style.visibility = 'visible';
+      setBackgroundInert(false);
+      document.removeEventListener('keydown', onKeydown);
+      panel.removeEventListener('keydown', onPanelTab);
+      setTimeout(() => {
+        panel.hidden = true;
+        if (lastFocused) lastFocused.focus();
+      }, 180);
+    }
+
+    function onKeydown(e) {
+      if (e.key === 'Escape') closePanel();
+    }
+
+    // Minimal focus containment: keep Tab cycling within the panel
+    // while it's open, without relying on a third-party focus-trap lib.
+    function onPanelTab(e) {
+      if (e.key !== 'Tab') return;
+      const focusable = Array.from(getFocusable());
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    btn.addEventListener('click', () => {
+      if (panel.hidden) openPanel();
+      else closePanel();
+    });
+    closeBtn.addEventListener('click', closePanel);
+  })();
+</script>
 
 <script type="module">
   import { GestureRecognizer, FilesetResolver } from
