@@ -1351,6 +1351,61 @@
 <div id="status-msg"></div>
 
 <script>
+  // ─── Analytics: anonymous gesture/usage events, logged via /api/log ───
+  // No PII collected — just a random session id (not tied to identity)
+  // and event timing, used to understand gesture discoverability and
+  // drop-off for the case study writeup.
+  (function () {
+    const SESSION_KEY = 'pt_session_id';
+    let sessionId = sessionStorage.getItem(SESSION_KEY);
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      sessionStorage.setItem(SESSION_KEY, sessionId);
+    }
+    const sessionStartTime = performance.now();
+
+    function logEvent(eventType, gesture) {
+      const payload = JSON.stringify({
+        session_id: sessionId,
+        event_type: eventType,
+        gesture: gesture || null,
+        ms_since_start: Math.round(performance.now() - sessionStartTime),
+      });
+      try {
+        navigator.sendBeacon('/api/log', new Blob([payload], { type: 'application/json' }));
+      } catch (e) {
+        fetch('/api/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
+      }
+    }
+    window.ptLog = logEvent;
+
+    logEvent('session_start');
+
+    let smallScreenLogged = window.innerWidth < 960;
+    if (smallScreenLogged) logEvent('small_screen_shown');
+    window.addEventListener('resize', () => {
+      if (window.innerWidth < 960 && !smallScreenLogged) {
+        smallScreenLogged = true;
+        logEvent('small_screen_shown');
+      }
+    });
+
+    function onSessionEnd() {
+      logEvent('session_end');
+    }
+    window.addEventListener('beforeunload', onSessionEnd);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') onSessionEnd();
+    });
+  })();
+</script>
+
+<script>
   (function () {
     const btn = document.getElementById('about-btn');
     const panel = document.getElementById('about-panel');
@@ -1379,6 +1434,7 @@
     }
 
     function openPanel() {
+      if (window.ptLog) window.ptLog('about_opened');
       lastFocused = document.activeElement;
       panel.hidden = false;
       btn.setAttribute('aria-expanded', 'true');
@@ -1489,6 +1545,7 @@
     cameraStarted = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (window.ptLog) window.ptLog('camera_granted');
       video.srcObject = stream;
       await video.play();
       document.getElementById('camera-pip').classList.add('visible');
@@ -1504,6 +1561,7 @@
       startLoop();
     } catch (err) {
       showStatus('Camera access denied. Please allow camera and refresh.');
+      if (window.ptLog) window.ptLog('camera_denied');
     }
   }
 
@@ -1550,6 +1608,7 @@
       lastVideoTime = video.currentTime;
       if (firstFrame) {
         firstFrame = false;
+        if (window.ptLog) window.ptLog('warmup_complete');
         hideLabel();
       }
       processResults(gestureRecognizer.recognizeForVideo(video, now), now);
@@ -1570,6 +1629,7 @@
     ).length : 0;
 
     if (handCount > 1 && activeHandCount > 1) {
+      if (!twoHandWarning && window.ptLog) window.ptLog('too_many_hands');
       showLabel('Too many hands!');
       twoHandWarning = true;
       return;
@@ -1654,6 +1714,7 @@
     if (hasHand && !detected && activeGesture === null) {
       if (!window._nudgeShown) {
         window._nudgeShown = true;
+        if (window.ptLog) window.ptLog('hint_shown');
         showLabel('Try adjusting your hand');
       }
     } else {
@@ -1665,6 +1726,7 @@
   }
 
   function triggerGesture(gesture) {
+    if (window.ptLog) window.ptLog('gesture_detected', gesture);
     activeGesture = gesture;
     currentCandidate = null;
     setState(gesture);
