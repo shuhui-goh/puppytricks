@@ -332,6 +332,28 @@
     #cmd-label.show {
       opacity: 1;
     }
+    .dot-loader {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 8px;
+      vertical-align: baseline;
+      padding-bottom: 1px;
+    }
+    .dot-loader span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.3;
+      animation: dot-bounce 0.9s ease-in-out infinite;
+    }
+    .dot-loader span:nth-child(1) { animation-delay: 0s; }
+    .dot-loader span:nth-child(2) { animation-delay: 0.1s; }
+    .dot-loader span:nth-child(3) { animation-delay: 0.2s; }
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+      40% { transform: translateY(-4px); opacity: 1; }
+    }
 
     /* ─── CAMERA PiP ─── */
     #proc-canvas {
@@ -434,19 +456,19 @@
       position: fixed;
       top: 24px;
       right: 24px;
-      width: 300px;
+      width: 315px;
       max-height: 420px;
-      background: rgba(30, 50, 20, 0.7);
+      background: rgba(30, 50, 20, 0.45);
       backdrop-filter: blur(40px) saturate(140%);
       -webkit-backdrop-filter: blur(40px) saturate(140%);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 20px 60px rgba(0,0,0,0.2);
       border-radius: 14px;
-      padding: 20px 48px 20px 20px;
+      padding: 20px 40px 20px 20px;
       overflow-y: auto;
       opacity: 0;
       transform-origin: top right;
-      transform: scale(0.1333); /* 40px / 300px, so the scaled-down box matches the closed button's footprint */
+      transform: scale(0.127); /* 40px / 315px, so the scaled-down box matches the closed button's footprint */
       transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
     }
@@ -456,7 +478,7 @@
       pointer-events: auto;
     }
     #about-panel:not(.open) {
-      transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.24s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #about-panel[hidden] {
       display: block; /* override default none so the close transition can finish */
@@ -495,7 +517,7 @@
       opacity: 1;
     }
     #about-panel:not(.open) #about-panel-content {
-      transition: opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.24s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .sr-only {
       position: absolute;
@@ -515,6 +537,7 @@
       line-height: 1.6;
       color: rgba(255, 255, 255, 0.82);
       margin: 0 0 14px;
+      text-wrap: pretty;
     }
     #about-panel p:last-child {
       margin-bottom: 0;
@@ -588,6 +611,94 @@
       #camera-pip { display: none !important; }
       #about-btn { display: none !important; }
       #about-panel { display: none !important; }
+    }
+
+    /* ─── CAMERA DENIED OVERLAY (mirrors small-screen-overlay) ─── */
+    #camera-denied-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    #camera-denied-overlay.visible { display: flex; }
+    .camera-denied-card {
+      background: rgba(30, 50, 20, 0.55);
+      backdrop-filter: blur(40px) saturate(140%);
+      -webkit-backdrop-filter: blur(40px) saturate(140%);
+      border-radius: 24px;
+      width: calc(100vw - 48px);
+      max-width: 480px;
+      padding: 32px 24px 28px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        0 20px 60px rgba(0,0,0,0.2);
+    }
+    .camera-denied-icon {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .camera-denied-card h2 {
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+    }
+    .camera-denied-card p {
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.82);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .camera-denied-card .tip {
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.4;
+      margin: 26px 0 0;
+    }
+    .camera-denied-card .tip b {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .glass-btn {
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      padding: 10px 24px;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.26);
+    }
+    .glass-btn:active {
+      background: rgba(255, 255, 255, 0.32);
+      transform: scale(0.96);
     }
   </style>
   <script>
@@ -1201,6 +1312,16 @@
   </div>
 </div>
 
+<div id="camera-denied-overlay">
+  <div class="camera-denied-card">
+    <div class="camera-denied-icon">📷</div>
+    <h2>Puppy can't see you</h2>
+    <p>Puppy needs your camera to see your gestures.</p>
+    <button type="button" class="glass-btn" id="camera-retry-btn">Request camera access</button>
+    <p class="tip"><b>Tip:</b> If nothing happens, try a private browsing window.</p>
+  </div>
+</div>
+
 <!-- ═══ MAIN SCREEN ═══ -->
 <div id="main-screen">
 
@@ -1297,7 +1418,7 @@
   </button>
   <div id="about-panel-content">
     <h2 id="about-panel-title" class="sr-only">About Puppy Tricks</h2>
-    <p>For anyone who's ever wanted a puppy and couldn't have one: this was made with you in mind too. That was me growing up, so I built one.</p>
+    <p>This was made for anyone who's ever wanted a puppy and couldn't have one. That includes me, growing up. So I built one.</p>
     <p>Code's on <a href="https://github.com/shuhui-goh/puppytricks" target="_blank" rel="noopener">GitHub</a>.</p>
     <p>Hope you enjoy it as much as I do, Shuhui 🐶</p>
   </div>
@@ -1464,7 +1585,7 @@
       setTimeout(() => {
         panel.hidden = true;
         if (lastFocused) lastFocused.focus();
-      }, 180);
+      }, 240);
     }
 
     function onKeydown(e) {
@@ -1541,19 +1662,25 @@
     goodboy: '#3D85A8',
   };
 
-  // ─── Auto-start ───
+  // ─── Camera gate ───
   let cameraStarted = false;
+  let cameraDenied = false;
 
   async function startCamera() {
     if (cameraStarted) return;
     cameraStarted = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      cameraDenied = false;
       if (window.ptLog) window.ptLog('camera_granted');
       video.srcObject = stream;
       await video.play();
       document.getElementById('camera-pip').classList.add('visible');
-      const readyLabelTimer = setTimeout(() => showLabel('Getting ready…'), 500);
+      const readyLabelTimer = setTimeout(() => {
+        clearTimeout(labelTimer);
+        cmdLabel.innerHTML = 'Getting ready<span class="dot-loader"><span></span><span></span><span></span></span>';
+        cmdLabel.classList.add('show');
+      }, 500);
       try {
         await initMediaPipe();
       } catch (mpErr) {
@@ -1564,20 +1691,43 @@
       clearTimeout(readyLabelTimer);
       startLoop();
     } catch (err) {
-      showStatus('Camera access denied. Please allow camera and refresh.');
+      cameraDenied = true;
+      if (window.innerWidth >= 960) {
+        document.getElementById('camera-denied-overlay').classList.add('visible');
+      }
       if (window.ptLog) window.ptLog('camera_denied');
     }
   }
 
-  // Only start camera if screen is wide enough
+  // One real ask, straight away — no pre-screen in front of it.
   if (window.innerWidth >= 960) {
     startCamera();
   }
 
-  // If user resizes to desktop, start camera then
+  // Same behavior as a fresh attempt — not a page reload.
+  // cameraStarted resets so startCamera() can run again.
+  document.getElementById('camera-retry-btn').addEventListener('click', () => {
+    document.getElementById('camera-denied-overlay').classList.remove('visible');
+    cameraStarted = false;
+    startCamera();
+  });
+
+  // Permission state is the entry point and persists once known.
+  // Viewport can only temporarily override which card is *displayed*
+  // (small-screen always wins while narrow) — it never erases the
+  // underlying state.
   window.addEventListener('resize', () => {
-    if (window.innerWidth >= 960 && !cameraStarted) {
-      startCamera();
+    if (window.innerWidth >= 960) {
+      if (cameraDenied) {
+        document.getElementById('camera-denied-overlay').classList.add('visible');
+      } else if (!cameraStarted) {
+        startCamera();
+      }
+    }
+    // Screen-size takes priority: if the window becomes too small,
+    // hide the camera-denied card so nothing stacks with small-screen-overlay.
+    if (window.innerWidth < 960) {
+      document.getElementById('camera-denied-overlay').classList.remove('visible');
     }
   });
 
